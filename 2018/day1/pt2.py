@@ -12,7 +12,7 @@ def run():
         deltas = [int(n) for n in f.read().splitlines()]
 
         current_freq = 0
-        reached_freqs = []
+        reached_freqs = set()
 
         while True:
             for delta in deltas:
@@ -22,7 +22,7 @@ def run():
                     print(f'found: {current_freq}')
                     return
 
-                reached_freqs.append(current_freq)
+                reached_freqs.add(current_freq)
                 current_freq += delta
 
 
