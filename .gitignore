@@ -1,0 +1,5 @@
+.idea
+venv
+
+# local files
+2018/day1/input.txt
