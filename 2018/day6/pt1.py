@@ -55,11 +55,6 @@ What is the size of the largest area that isn't infinite?
 import timeit
 from typing import Dict, Tuple, List
 
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.markers import MarkerStyle
-
 
 def run() -> None:
     """
@@ -71,12 +66,6 @@ def run() -> None:
         grid = {}  # type: Dict[Tuple[int, int], Tuple[int, int]]
         points = [(int(x.split(", ")[0]), int(x.split(", ")[1])) for x in
                   data]  # type: List[Tuple[int, int]]
-
-        colors = matplotlib.colors.get_named_colors_mapping()
-
-        points_encode_colors = {}
-        for idx, point in enumerate(points):
-            points_encode_colors[point] = list(colors.values())[idx]
 
         # Get min and max x and y.
         max_x = 0
@@ -94,9 +83,6 @@ def run() -> None:
                 min_x = point[0]
             if point[1] < min_y:
                 min_y = point[1]
-
-        print(f'max_x {max_x}, max_y {max_y}')
-        print(f'min_x {min_x}, min_y {min_y}')
 
         # Fill grid with coords.
         for point in points:
@@ -143,67 +129,7 @@ def run() -> None:
                 except KeyError:
                     pass
 
-        # for point in points:
-        #     data = np.array([
-        #         [cell[0], cell[1]] for cell, owner in grid.items() if
-        #         owner == point
-        #     ])
-        #     x, y = data.T
-        #     plt.scatter(x, y, marker=MarkerStyle(marker=","))
-
-        for point in points:
-            data = np.array(
-                [[cell[0], cell[1]] for cell, owner in grid.items() if
-                 owner == point]
-            )
-            x, y = data.T
-            plt.scatter(x, y, c=points_encode_colors[point],
-                        marker=MarkerStyle(marker="x"))
-
-        # for cell, owner in grid.items():
-        #     if owner is not None:
-        #         plt.plot(
-        #             cell[0],
-        #             cell[1],
-        #             c=points_encode_colors[owner],
-        #             marker=",",
-        #         )
-
-        for point in points:
-            plt.plot(
-                point[0],
-                point[1],
-                c='g',
-                marker="o",
-            )
-
-        for point in areas:
-            plt.plot(
-                point[0],
-                point[1],
-                c='r',
-                marker="x",
-            )
-
-        # data = np.array([[point[0], point[1]] for point in points])
-        # x, y = data.T
-        # plt.scatter(x, y, marker=))
-
-        # data = np.array([[point[0], point[1]] for point in areas])
-        # x, y = data.T
-        # plt.scatter(x, y, marker=MarkerStyle(marker="x"))
-
-        # plt.gca().invert_yaxis()
-        plt.ylim(min_y - 2, max_y + 2)
-        plt.xlim(min_x - 2, max_x + 2)
-
-        plt.savefig('result.png', dpi=1000)
-
-        print(areas)
-
         print(max(areas.values()))
 
 
 print(timeit.timeit(run, number=1))
-# 3930 too high
-# 3970 too high
