@@ -71,7 +71,6 @@ def run() -> None:
         current_player = 0
         circle = [0]  # type: List[int]
         current_player += 1
-        print(f'[{current_player}]', circle)
 
         scores = {}
         for player in range(players_count):
@@ -90,8 +89,6 @@ def run() -> None:
                 else:
                     current_idx = 1
                 circle.insert(current_idx, i)
-
-            print(f'{i}/{last_marble_worth}')
 
             if current_player == players_count - 1:
                 current_player = 0
