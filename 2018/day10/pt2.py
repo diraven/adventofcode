@@ -1,12 +1,14 @@
 """
-Amused by the speed of your answer, the Elves are curious:
+--- Part Two ---
 
-What would the new winning Elf's score be if the number of the last marble were 100 times larger?
+Good thing you didn't have to wait, because that would have taken a long time - much longer than the 3 seconds in the example above.
+
+Impressed by your sub-hour communication capabilities, the Elves are curious: exactly how many seconds would they have needed to wait for that message to appear?
 """
+import copy
+import re
 import timeit
-from typing import List
-
-from blist import blist
+from typing import List, Tuple
 
 Circle = List[int]
 
@@ -15,44 +17,58 @@ def run() -> None:
     """
     Main function.
     """
+    # with open("./input.example.txt") as f:
     with open("./input.txt") as f:
-        data = f.read().splitlines()[0].split()
-        players_count = int(data[0])
-        last_marble_worth = int(data[6]) * 100
+        rexp = re.compile(
+            r"position=<\s*([-0-9]+),\s+([-0-9]+)>\s+"
+            r"velocity=<\s?([-0-9]+),\s+([-0-9]+)>"
+        )
 
-        current_idx = 0
-        current_player = 0
-        circle = blist([0])
-        current_player += 1
+        points = []  # type: List[List[Tuple[int, int], Tuple[int, int]]]
 
-        scores = {}
-        for player in range(players_count):
-            scores[player] = 0
+        for line in f.read().splitlines():
+            matched = re.match(rexp, line)
+            if matched:
+                points.append([
+                    (int(matched[1]), int(matched[2])),
+                    (int(matched[3]), int(matched[4])),
+                ])
 
-        circle_len = 1
+        frame = {}
+        tmp_coords = (list(zip(*[item[0] for item in points])))
+        sx = max(tmp_coords[0]) - min(tmp_coords[0])
+        sy = max(tmp_coords[1]) - min(tmp_coords[1])
+        current_scatter = sx + sy
 
-        for i in range(1, last_marble_worth):
-            if i % 23 == 0:
-                scores[current_player] += i
-                current_idx = (current_idx - 7) % circle_len
-                scores[current_player] += circle.pop(current_idx)
-                circle_len -= 1
-                if current_idx > circle_len - 1:
-                    current_idx = 0
+        stop = False
+        seconds_elapsed = 0
+        while True:
+            if stop:
+                break
+            previous_points = copy.deepcopy(points)
+            # Apply velocities.
+            for point in points:
+                point[0] = (
+                    point[0][0] + point[1][0], point[0][1] + point[1][1]
+                )
+
+            # Calculate scatter.
+            tmp_coords = (list(zip(*[item[0] for item in points])))
+            min_x = min(tmp_coords[0])
+            max_x = max(tmp_coords[0])
+            min_y = min(tmp_coords[1])
+            max_y = max(tmp_coords[1])
+            sx = max_x - min_x
+            sy = max_y - min_y
+            scatter = sx + sy
+
+            if scatter <= current_scatter:
+                current_scatter = scatter
+                seconds_elapsed += 1
+
             else:
-                if circle_len > 1:
-                    current_idx = (current_idx + 2) % circle_len
-                else:
-                    current_idx = 1
-                circle.insert(current_idx, i)
-                circle_len += 1
-
-            if current_player == players_count - 1:
-                current_player = 0
-            else:
-                current_player += 1
-
-        print(max(scores.values()))
+                print(seconds_elapsed)
+                stop = True
 
 
 print(timeit.timeit(run, number=1))

@@ -206,7 +206,6 @@ def run() -> None:
                 seconds_elapsed += 1
 
             else:
-                print(seconds_elapsed)
                 for y in range(min_y, max_y + 1):
                     for x in range(min_x, max_x + 1):
                         try:
