@@ -34,7 +34,6 @@ def run() -> None:
                     (int(matched[3]), int(matched[4])),
                 ])
 
-        frame = {}
         tmp_coords = (list(zip(*[item[0] for item in points])))
         sx = max(tmp_coords[0]) - min(tmp_coords[0])
         sy = max(tmp_coords[1]) - min(tmp_coords[1])
@@ -42,6 +41,8 @@ def run() -> None:
 
         stop = False
         seconds_elapsed = 0
+
+        granularity = 10000
         while True:
             if stop:
                 break
@@ -49,7 +50,8 @@ def run() -> None:
             # Apply velocities.
             for point in points:
                 point[0] = (
-                    point[0][0] + point[1][0], point[0][1] + point[1][1]
+                    point[0][0] + point[1][0] * granularity,
+                    point[0][1] + point[1][1] * granularity,
                 )
 
             # Calculate scatter.
@@ -64,8 +66,10 @@ def run() -> None:
 
             if scatter <= current_scatter:
                 current_scatter = scatter
-                seconds_elapsed += 1
-
+                seconds_elapsed += 1 * granularity
+            elif granularity > 1:
+                granularity /= 10
+                points = copy.deepcopy(previous_points)
             else:
                 print(seconds_elapsed)
                 stop = True
