@@ -178,9 +178,9 @@ def run() -> None:
         sx = max(tmp_coords[0]) - min(tmp_coords[0])
         sy = max(tmp_coords[1]) - min(tmp_coords[1])
         current_scatter = sx + sy
-        previous_points = []
 
         stop = False
+        seconds_elapsed = 0
         while True:
             if stop:
                 break
@@ -203,8 +203,10 @@ def run() -> None:
 
             if scatter <= current_scatter:
                 current_scatter = scatter
+                seconds_elapsed += 1
 
             else:
+                print(seconds_elapsed)
                 for y in range(min_y, max_y + 1):
                     for x in range(min_x, max_x + 1):
                         try:
