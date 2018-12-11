@@ -44,9 +44,6 @@ def run() -> None:
 
         print("done")
 
-        # current_cell = (90, 269, 16)
-        # current_total_power = 113
-        # min_size = 4
         current_cell = (0, 0, 0)
         current_total_power = 0
         min_size = 1
