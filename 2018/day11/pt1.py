@@ -99,9 +99,6 @@ def run() -> None:
                     current_total_power = total_power
 
         print(current_cell)
-        print(current_total_power)
 
-
-# not 94,270
 
 print(timeit.timeit(run, number=1))
