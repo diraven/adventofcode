@@ -73,6 +73,4 @@ def run() -> None:
         print(current_cell)
 
 
-# not 28,75,13
-# not 90,269,16
 print(timeit.timeit(run, number=1))
