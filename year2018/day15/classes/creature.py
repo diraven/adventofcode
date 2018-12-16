@@ -66,6 +66,9 @@ class Creature:
         target_creature.hp -= self.ap
         if not target_creature.alive:
             target_creature.cell.content = None
+            from year2018.day15.classes.elf import Elf
+            if isinstance(target_creature, Elf):
+                self.cell.grid.casualties += 1
 
     def go(self, enemy_locations: List[Cell]) -> None:
         grid = Grid(matrix=self.cell.grid.encoded())
@@ -98,5 +101,5 @@ class Creature:
             dest.content = self
 
         except IndexError:
-            pass
             # print(f"{repr(self)}: nowhere to go!")
+            pass

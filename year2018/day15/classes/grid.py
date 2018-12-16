@@ -10,6 +10,7 @@ from .wall import Wall
 class Grid:
     def __init__(self, data: str):
         self.grid = []
+        self.casualties = 0
 
         for row_num, row in enumerate(data.splitlines()):
             self.grid.append([])
