@@ -3,4 +3,4 @@ venv
 
 # local files
 input.txt
-input.example.txt
+input.example*.txt
