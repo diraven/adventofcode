@@ -94,8 +94,6 @@ with open("./input.txt") as f:
 
     registers = [0] * 6
 
-    # registers[0] = 1
-
     while True:
         apply(instructions[registers[ip]], registers)
         if registers[ip] > len(instructions) - 2:
