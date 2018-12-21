@@ -25,6 +25,7 @@ What is the lowest non-negative integer value for register 0 that causes the pro
 """
 
 # Reverse-engineered from the program input.
+# See annotated input for details.
 
 x, a, b, c, d, e = (1, 0, 0, 0, 0, 0)
 c = 0  # 5
