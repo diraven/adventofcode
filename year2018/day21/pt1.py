@@ -45,7 +45,7 @@ while True:
         print(c)
         exit()
         if c == x:
-            print('EXIT()', e)
+            print('EXIT()', c)
             exit()
         else:
             a = c | 65536  # 6
