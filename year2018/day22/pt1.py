@@ -58,11 +58,8 @@ In the cave system above, because the mouth is at 0,0 and the target is at 10,10
 
 What is the total risk level for the smallest rectangle that includes 0,0 and the target's coordinates?
 """
-from collections import namedtuple
 
 import numpy as np
-
-Cell = namedtuple('Cell', ('x', 'y'))
 
 with open("input.txt") as f:
     data = f.read().splitlines()
