@@ -357,15 +357,9 @@ with open("input.txt") as f:
                             g.add_edge(original_node, other_tool_node,
                                        weight=7)
 
-    path = networkx.dijkstra_path(
+    print(networkx.shortest_path_length(
         g,
         Node(0, 0, TOOL_TORCH),
         Node(target_x, target_y, TOOL_TORCH),
-    )
-
-    weight = 0
-    for step, node in enumerate(path):
-        if step > 0:
-            weight += g.get_edge_data(path[step], path[step - 1])['weight']
-
-    print(weight)
+        weight='weight'
+    ))
