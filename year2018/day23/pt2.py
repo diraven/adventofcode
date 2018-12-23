@@ -137,16 +137,16 @@ def main():
         height = max_y - min_y
         depth = max_z - min_z
 
-        step = int(min(width, height, depth) / 10)
+        step = int(min(width, height, depth) / 30)
 
         locations = search(
             bots,
-            min_x - step,
-            max_x + step,
-            min_y - step,
-            max_y + step,
-            min_z - step,
-            max_z + step,
+            min_x,
+            max_x,
+            min_y,
+            max_y,
+            min_z,
+            max_z,
             step
         )
 
@@ -154,5 +154,5 @@ def main():
 
 
 # 73223365 too low
-# 86012062 not right
+# 86012062 too low
 main()
