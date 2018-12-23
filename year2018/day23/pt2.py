@@ -18,82 +18,42 @@ Many coordinates are in range of some of the nanobots in this formation. However
 
 Find the coordinates that are in range of the largest number of nanobots. What is the shortest manhattan distance between any of those points and 0,0,0?
 """
-from collections import namedtuple
+import itertools
 from typing import List
 
-Bot = namedtuple('Bot', ('x', 'y', 'z', 'strength'))
-Loc = namedtuple('Location', ('x', 'y', 'z', 'bots_in_range_count'))
+import numpy as np
 
 
-class Location(Loc):
+class Location:
+    def __init__(self, bots, x: int, y: int, z: int) -> None:
+        self.x = x  # type: int
+        self.y = y  # type: int
+        self.z = z  # type: int
+        self.bots_in_range = 0
+        for bot in bots:
+            if self.distance_to(bot) <= bot.strength:
+                self.bots_in_range += 1
+
+    def __str__(self):
+        return f'({self.x}, {self.y}, {self.z})'
+
     def distance_to(self, other: 'Location') -> int:
-        if not hasattr(self, 'distances'):
-            self.distances = {}
-        if other not in self.distances:
-            self.distances[other] = abs(self.x - other.x) + \
-                                    abs(self.y - other.y) + \
-                                    abs(self.z - other.z)
-
-        return self.distances[other]
+        return abs(self.x - other.x) + abs(self.y - other.y) + abs(
+            self.z - other.z)
 
 
-def find_best_locations(
-        bots: List[Bot],
-        step: int,
-        min_x: int,
-        max_x: int,
-        min_y: int,
-        max_y: int,
-        min_z: int,
-        max_z: int,
-) -> List[Location]:
-    locations = []
-    for x in range(min_x, max_x + 1, step):
-        for y in range(min_y, max_y + 1, step):
-            for z in range(min_z, max_z + 1, step):
-                bots_in_range_count = 0
-                for bot in bots:
-                    distance = abs(bot.x - x) + abs(
-                        bot.y - y) + abs(bot.z - z)
-                    if distance <= bot.strength:
-                        bots_in_range_count += 1
-                        locations.append(
-                            Location(x, y, z, bots_in_range_count))
+class Bot(Location):
+    def __init__(self, bots, x: int, y: int, z: int, strength: int) -> None:
+        super().__init__(bots, x, y, z)
+        self.strength = strength
+        self.bots_in_range_count = 0
 
-    # Pick best locations.
-    max_bots_in_range = max(l.bots_in_range_count for l in locations)
-    locations = [l for l in locations if
-                 l.bots_in_range_count == max_bots_in_range]
-
-    my_location = Location(0, 0, 0, 0)
-    min_distance = min(l.distance_to(my_location) for l in locations)
-    resulting_locations = [l for l in locations if
-                           l.distance_to(my_location) == min_distance]
-
-    if locations:
-        print(len(locations), step)
-
-    if step > 2:
-        locations = set()
-        for location in resulting_locations:
-            for l in find_best_locations(
-                    bots,
-                    int(step / 2),
-                    location.x - step,
-                    location.x + step,
-                    location.y - step,
-                    location.y + step,
-                    location.z - step,
-                    location.z + step,
-            ):
-                locations.add(l)
-
-    return resulting_locations
+    def __str__(self):
+        return f'{super().__str__()}: {self.strength}, {self.bots_in_range_count}'
 
 
-def main() -> None:
+def main():
     bots = []  # type: List[Bot]
-
     with open("input.txt") as f:
         data = f.read().splitlines()
 
@@ -102,31 +62,48 @@ def main() -> None:
             position = splitted[0].replace('pos=<', '').rstrip('>').split(',')
             strength = splitted[1].replace('r=', '')
             bots.append(
-                Bot(*([int(coord) for coord in position] + [int(strength)]))
+                Bot(bots, *([int(coord) for coord in position] + [int(strength)]))
             )
 
-        min_x = min(bot.x for bot in bots)
-        max_x = max(bot.x for bot in bots)
+        heated_coords = []
+        for i, axis in enumerate('xyz'):
+            print(axis)
+            heated_coords.append([])
+            vals = [getattr(b, axis) for b in bots]
+            min_val = min(vals)
+            max_val = max(vals)
+            width = max_val - min_val
+            heat = np.full(width, dtype=np.int, fill_value=0)
+            for bot in bots:
+                print(bot)
+                for val in range(
+                        max(getattr(bot, axis) - bot.strength, min_val),
+                        min(getattr(bot, axis) + bot.strength, max_val)
+                ):
+                    heat[val - min_val] += 1
+            max_heat = np.max(heat)
+            for v, heat in enumerate(heat):
+                if heat == max_heat:
+                    heated_coords[i].append(v + min_val)
+            print('done')
 
-        min_y = min(bot.y for bot in bots)
-        max_y = max(bot.y for bot in bots)
+        best_location = None
+        origin = Location(bots, 0, 0, 0)
+        for coords_set in list(itertools.product(*heated_coords)):
+            location = Location(bots, coords_set[0], coords_set[1],
+                                coords_set[2])
+            if not best_location:
+                best_location = location
+            else:
+                if location.bots_in_range > best_location.bots_in_range:
+                    best_location = location
+                elif location.bots_in_range == best_location.bots_in_range \
+                        and \
+                        location.distance_to(origin) < \
+                        best_location.distance_to(origin):
+                    best_location = location
 
-        min_z = min(bot.z for bot in bots)
-        max_z = max(bot.z for bot in bots)
-
-        step = 10 ** 7
-        locations = find_best_locations(
-            bots, step, min_x, max_x, min_y, max_y, min_z, max_z
-        )
-
-        [print(f'{l} {l.distance_to(Location(0, 0, 0, 0))}') for l in
-         locations]
-
-    # print(location.distance_to(Location(0, 0, 0, 0)))
-    # 86012062 too low
-    # 86012062
-    # 86012062
-    # 86012063 too low
+        print(best_location.distance_to(origin))
 
 
 main()
