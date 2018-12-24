@@ -18,13 +18,12 @@ Many coordinates are in range of some of the nanobots in this formation. However
 
 Find the coordinates that are in range of the largest number of nanobots. What is the shortest manhattan distance between any of those points and 0,0,0?
 """
+import math
 from collections import namedtuple
 from typing import List
 
 Bot = namedtuple('Bot', ('x', 'y', 'z', 'strength'))
 Location = namedtuple('Location', ('x', 'y', 'z'))
-
-step_divisor = 5
 
 total_low_level = 0
 
@@ -76,7 +75,7 @@ def search(bots, min_x, max_x, min_y, max_y, min_z, max_z, step,
     locations = []
     for x in range(max_x + step, min_x, -step):
         for y in range(max_y + step, min_y, -step):
-            for z in range(max_z + step, min_z, -step):
+            for z in range(min_z, max_z + step, step):
                 locations.append(Location(x, y, z))
 
     filtered_locations = filter_locations(bots, locations)
@@ -92,10 +91,7 @@ def search(bots, min_x, max_x, min_y, max_y, min_z, max_z, step,
     if step == 1:
         return filtered_locations
     else:
-        if step < step_divisor:
-            new_step = 1
-        else:
-            new_step = int(step / step_divisor)
+        new_step = step // 2
 
         resulting_locations = []
         for l in filtered_locations:
@@ -137,7 +133,9 @@ def main():
         height = max_y - min_y
         depth = max_z - min_z
 
-        step = int(min(width, height, depth) / 30)
+        # step = int(min(width, height, depth) / 10)
+        step = int(math.pow(2, math.floor(
+            math.log(min(width, height, depth), 2)) + 1))
 
         locations = search(
             bots,
@@ -150,9 +148,19 @@ def main():
             step
         )
 
+        l = locations[0]
+        in_range = 0
+        for b in bots:
+            if abs(b.x - l.x) + abs(b.y - l.y) + abs(
+                    b.z - l.z) <= b.strength:
+                in_range += 1
+
+        print(in_range)
+
         print(sum(filter_locations(bots, locations)[0]))
 
 
 # 73223365 too low
 # 86012062 too low
+# 88122632
 main()
